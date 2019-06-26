@@ -6,4 +6,4 @@ e.g. 9P 9R 9 32 100 400
 
 Here P & R stand for Press and Release respectively. If P is used, the corresponding key is pressed and not released. Similarly, if R is used, the key is only released. If no param is used then the key will be pressed and released consecutively.
 
-This means here Tab key will be pressed, then released and then again pressed and released consecutively followed by the space key press and release. The iteration count is 100 and 400 is the time gap between each key execution.
+This means here Tab key will be pressed, then released and then again pressed and released consecutively followed by the space key press and release. The iteration count is 100 and 400 is the millisecond time gap between each key execution.
