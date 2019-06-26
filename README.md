@@ -1,4 +1,4 @@
-# keypressiterator
+# Keypressiterator
 
 The input of the program is A B C D ..... Y Z .. where A B C D are the KeyCodes to be executed. X is the number of iterations to be performed for the given KeyCode set. Z is the time interval in milliseconds between each key execution. It is a good practice to keep the time interval within the range of 300-500.
 
