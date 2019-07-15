@@ -3,12 +3,18 @@
  */
 package com.shankarsan.keypressiterator;
 
-import java.awt.AWTException;
-import java.awt.Robot;
+import java.awt.HeadlessException;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Scanner;
+
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -19,62 +25,76 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class MainController {
 	
-	private static final String keyPressFlag = "P";
-	private static final String keyReleaseFlag = "R";
-
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		List<String> argList = null;
-		Robot keyPressRobot = null;
-		int sleepInterval = 0, iterations = 0;
-		String keyCode = null;
-		String keyCodeArg = null;
-		Set<Integer> pressedKeysList = null;
-//		System.out.println(KeyEvent.VK_WINDOWS + " " + KeyEvent.VK_TAB);
+		List<String> argsList = null;
+		int keyCombinationTimeAllot = 0;
+		KeyPressCapturer keyPressCapturer = null;
+		String[] keyCombinationArray = null;
+		JFrame frame = null;
+		JLabel label = null;
+		JLabel timeLabel = null;
+		JPanel panel = null;
 		try {
-			if (ArrayUtils.isNotEmpty(args) && args.length > 1 &&
-					(argList = Arrays.asList(args))
-						.stream()
-						.allMatch(arg -> 
-							NumberUtils.isParsable(arg.split(keyPressFlag)[0]) || NumberUtils.isParsable(arg.split(keyReleaseFlag)[0])
-						)) {
-				sleepInterval = NumberUtils.toInt(argList.get(argList.size() - 1));
-				iterations = NumberUtils.toInt(argList.get(argList.size() - 2));
-				keyPressRobot = new Robot();
-				
-				Thread.sleep(3000);
-				while(iterations-- > 0) {
-					for(int index = 0; index < argList.size() - 2; index++) {
-						keyCodeArg = argList.get(index);
-						keyCode = keyCodeArg.split(keyPressFlag)[0].split(keyReleaseFlag)[0];
-						if(keyCode.equals(keyCodeArg)) {
-							keyPressRobot.keyPress(NumberUtils.toInt(keyCode));
-							keyPressRobot.keyRelease(NumberUtils.toInt(keyCode));
-						}else if(keyCodeArg.contains(keyPressFlag)) {
-							keyPressRobot.keyPress(NumberUtils.toInt(keyCode));
-							if(null == pressedKeysList) {
-								pressedKeysList = new HashSet<>();
-							}
-							pressedKeysList.add(NumberUtils.toInt(keyCode));
-						}else if(keyCodeArg.contains(keyReleaseFlag)) {
-							keyPressRobot.keyRelease(NumberUtils.toInt(keyCode));
-						}
-						Thread.sleep(sleepInterval);
-					}
-				}
-			} else {
-				System.out.println("Invalid input!!! Please enter the list of key codes as integer, each integer followed by '!' if key is to be put on hold. The iteration count as second last param and the interval in seconds as the last pararm!");
+			argsList = new ArrayList<String>();
+			System.out.print("*********** Welcome to KeyPressIterator Program!!! ***********");
+			System.out.print("\nPlease enter the time (in seconds) you need to enter the desired key-combination: ");
+			Scanner scanner = new Scanner(System.in);
+			keyCombinationTimeAllot = NumberUtils.toInt(scanner.next());
+			System.out.print("Now please enter the pause time (in milliseconds) between each key execution. Note that higher pause time will help you to visualize the changes better: ");
+			argsList.add(scanner.next());
+			System.out.print("Please enter the number of key-combination iterations you desire: ");
+			argsList.add(scanner.next());
+			System.out.print("WARNING: The next step is for entering the key-combination for your choice. Please note that you have alloted " + keyCombinationTimeAllot +
+					" seconds for this purpose. A countdown timer will run showing the time remaining before the iteration starts. Please press any key to begin.");
+			System.in.read();
+			
+			keyPressCapturer = new KeyPressCapturer();
+			frame = new JFrame();
+			frame.setSize(600, 600);
+			frame.addKeyListener(keyPressCapturer);
+			frame.setAlwaysOnTop(true);
+			panel = new JPanel();
+			panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+			frame.add(panel);
+			label = new JLabel();
+			timeLabel = new JLabel();
+			timeLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
+			timeLabel.setVerticalTextPosition(SwingConstants.TOP);
+			panel.add(timeLabel);
+			panel.add(label);
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			
+			keyCombinationTimeAllot *= 5;
+			while(keyCombinationTimeAllot > 0) {
+				timeLabel.setText(keyCombinationTimeAllot / 5 + " seconds remaining.");
+				label.setText(keyPressCapturer.toString());
+				keyCombinationTimeAllot--;
+				Thread.sleep(200);
 			}
-		} catch (AWTException | InterruptedException e) {
+			
+			keyCombinationArray = ArrayUtils.toStringArray(keyPressCapturer.getKeyCombination().toArray());
+			ArrayUtils.reverse(keyCombinationArray);
+			argsList.addAll(Arrays.asList(keyCombinationArray));
+			
+			keyCombinationArray = ArrayUtils.toStringArray(argsList.toArray());
+			ArrayUtils.reverse(keyCombinationArray);
+			argsList = Arrays.asList(keyCombinationArray);
+			
+			scanner.close();
+			
+			System.out.println(argsList.toString());
+		} catch (HeadlessException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-			if(null != pressedKeysList && null != keyPressRobot) {
-				for(Integer pressedKeyCode : pressedKeysList) {
-					keyPressRobot.keyRelease(pressedKeyCode);
-				}
-			}
+			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 		}
 
 	}
