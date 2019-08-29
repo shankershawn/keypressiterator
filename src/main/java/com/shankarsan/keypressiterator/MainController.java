@@ -3,8 +3,10 @@
  */
 package com.shankarsan.keypressiterator;
 
+import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,22 +58,24 @@ public class MainController {
 			frame.setSize(600, 600);
 			frame.addKeyListener(keyPressCapturer);
 			frame.setAlwaysOnTop(true);
-			panel = new JPanel();
+			panel = new JPanel(new GridLayout(2, 1, 10, 10));
 			panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 			frame.add(panel);
 			label = new JLabel();
 			timeLabel = new JLabel();
-			timeLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
-			timeLabel.setVerticalTextPosition(SwingConstants.TOP);
+			timeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+			timeLabel.setVerticalAlignment(SwingConstants.TOP);
 			panel.add(timeLabel);
+			label.setHorizontalAlignment(SwingConstants.LEFT);
+			label.setVerticalAlignment(SwingConstants.TOP);
 			panel.add(label);
 			frame.setVisible(true);
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			
 			keyCombinationTimeAllot *= 5;
 			while(keyCombinationTimeAllot > 0) {
 				timeLabel.setText(keyCombinationTimeAllot / 5 + " seconds remaining.");
-				label.setText(keyPressCapturer.toString());
+				label.setText("<html>" + keyPressCapturer.toString() + "</html>");
 				keyCombinationTimeAllot--;
 				Thread.sleep(200);
 			}
@@ -87,14 +91,10 @@ public class MainController {
 			scanner.close();
 			
 			System.out.println(argsList.toString());
-		} catch (HeadlessException | SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
 			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+			KeyIteratorImpl.getInstance().process(keyCombinationArray);
+		} catch (HeadlessException | SecurityException | IOException | InterruptedException e) {
+			e.printStackTrace();
 		}
 
 	}

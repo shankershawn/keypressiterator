@@ -19,6 +19,15 @@ import org.apache.commons.lang3.math.NumberUtils;
  */
 public class KeyIteratorImpl implements KeyIterator {
 	
+	private static KeyIterator keyIterator;
+	
+	public static KeyIterator getInstance() {
+		if(null == keyIterator) {
+			keyIterator = new KeyIteratorImpl();
+		}
+		return keyIterator;
+	}
+	
 	/**
 	 * @param args
 	 */
