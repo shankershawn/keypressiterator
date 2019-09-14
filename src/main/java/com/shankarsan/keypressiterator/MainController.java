@@ -39,11 +39,12 @@ public class MainController {
 		JLabel label = null;
 		JLabel timeLabel = null;
 		JPanel panel = null;
+		Scanner scanner = null;
 		try {
 			argsList = new ArrayList<String>();
 			System.out.print("*********** Welcome to KeyPressIterator Program!!! ***********");
 			System.out.print("\nPlease enter the time (in seconds) you need to enter the desired key-combination: ");
-			Scanner scanner = new Scanner(System.in);
+			scanner = new Scanner(System.in);
 			keyCombinationTimeAllot = NumberUtils.toInt(scanner.next());
 			System.out.print("Now please enter the pause time (in milliseconds) between each key execution. Note that higher pause time will help you to visualize the changes better: ");
 			argsList.add(scanner.next());
@@ -88,13 +89,15 @@ public class MainController {
 			ArrayUtils.reverse(keyCombinationArray);
 			argsList = Arrays.asList(keyCombinationArray);
 			
-			scanner.close();
-			
 			System.out.println(argsList.toString());
 			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 			KeyIteratorImpl.getInstance().process(keyCombinationArray);
 		} catch (HeadlessException | SecurityException | IOException | InterruptedException e) {
 			e.printStackTrace();
+		} finally {
+			if(null != scanner) {
+				scanner.close();
+			}
 		}
 
 	}
