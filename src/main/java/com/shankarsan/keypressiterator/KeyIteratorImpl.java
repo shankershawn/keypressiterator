@@ -28,6 +28,10 @@ public class KeyIteratorImpl implements KeyIterator {
 		return keyIterator;
 	}
 	
+	private KeyIteratorImpl() {
+		
+	}
+	
 	/**
 	 * @param args
 	 */

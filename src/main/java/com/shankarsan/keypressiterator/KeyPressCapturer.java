@@ -51,11 +51,18 @@ public class KeyPressCapturer implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		keyCombination.add(e.getKeyCode() + Constants.KEY_PRESS_FLAG);
+		keyCombination.add(tabKeyHandler(e.getKeyCode())
+				+ Constants.KEY_PRESS_FLAG);
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		keyCombination.add(e.getKeyCode() + Constants.KEY_RELEASE_FLAG);
+		keyCombination.add(tabKeyHandler(e.getKeyCode())
+				+ Constants.KEY_RELEASE_FLAG);
+	}
+	
+	/*Special Method to capture tab key. Tilde key will be considered as tab*/
+	private int tabKeyHandler(int keyCode) {
+		return KeyEvent.VK_BACK_QUOTE == keyCode ? KeyEvent.VK_TAB : keyCode;
 	}
 }
